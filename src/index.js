@@ -9,11 +9,20 @@
 const SignalGeneratorManager = require('./signals');
 const { BlePeripheral } = require('./ble');
 const ClinicalMetricsEngine = require('./metrics');
+const { parseArgs, startInteractiveMode, colors } = require('./cli');
+
+// Parse CLI arguments
+const opts = parseArgs(process.argv);
 
 // Simulator shared state
 const simulatorState = {
   // Signal generator
-  signalGenerator: new SignalGeneratorManager({ pattern: 'sine', amplitude: 800 }),
+  signalGenerator: new SignalGeneratorManager({
+    pattern: opts.pattern,
+    amplitude: opts.amplitude,
+    frequency: opts.frequency,
+    noiseLevel: opts.noise,
+  }),
 
   // BLE state
   connected: false,
@@ -50,7 +59,8 @@ const simulatorState = {
   metricsEngine: null,
 };
 
-console.log('RYO BLE Simulator v0.1.0');
+console.log(colors.cyan('RYO BLE Simulator v0.1.0'));
+console.log(`Pattern: ${opts.pattern} | Amplitude: ${opts.amplitude} | Frequency: ${opts.frequency} Hz | Noise: ${opts.noise}`);
 console.log('Starting BLE peripheral...');
 
 // Initialize metrics engine
@@ -59,7 +69,6 @@ simulatorState.metricsEngine = metricsEngine;
 
 // Feed samples to metrics engine and update metrics at 1 Hz
 setInterval(() => {
-  // Feed recent samples (the EMG stream generates at 20 Hz, metrics at 1 Hz)
   const sample = simulatorState.lastSample;
   if (sample) {
     metricsEngine.addSample(sample.flex, sample.ext);
@@ -69,17 +78,23 @@ setInterval(() => {
   simulatorState.metrics = metricsEngine.calculate();
 }, 1000);
 
+// Start BLE peripheral
 const peripheral = new BlePeripheral(simulatorState);
 peripheral.start();
+
+// Start interactive CLI
+const rl = startInteractiveMode(simulatorState);
 
 // Graceful shutdown
 process.on('SIGINT', () => {
   console.log('\nShutting down...');
   peripheral.stop();
+  if (rl) rl.close();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   peripheral.stop();
+  if (rl) rl.close();
   process.exit(0);
 });
