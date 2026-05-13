@@ -1,0 +1,48 @@
+'use strict';
+
+/**
+ * BLE GATT constants matching the RYO firmware.
+ */
+
+// Service UUID
+const SERVICE_UUID = '19b10000e8f2537e4f6cd104768a1214';
+
+// Characteristic UUIDs (last 4 digits differ)
+const CHAR_EMG_STREAM = '19b10001e8f2537e4f6cd104768a1214';
+const CHAR_COMMAND = '19b10002e8f2537e4f6cd104768a1214';
+const CHAR_CONFIG = '19b10003e8f2537e4f6cd104768a1214';
+const CHAR_DEVICE_INFO = '19b10004e8f2537e4f6cd104768a1214';
+const CHAR_CLINICAL_METRICS = '19b10005e8f2537e4f6cd104768a1214';
+const CHAR_SESSION_CONTROL = '19b10006e8f2537e4f6cd104768a1214';
+
+// Device info static values
+const FW_VERSION_MAJOR = 3;
+const FW_VERSION_MINOR = 0;
+const NUM_ELECTRODES = 2;
+const HW_REVISION = 1;
+const ADC_MAX = 4095;
+const SIGNAL_MAX = 1200;
+const ACTIVE_THRESHOLD = 150;
+const SAMPLE_RATE = 100;
+
+// Device name for advertising
+const DEVICE_NAME = 'kawable';
+
+module.exports = {
+  SERVICE_UUID,
+  CHAR_EMG_STREAM,
+  CHAR_COMMAND,
+  CHAR_CONFIG,
+  CHAR_DEVICE_INFO,
+  CHAR_CLINICAL_METRICS,
+  CHAR_SESSION_CONTROL,
+  FW_VERSION_MAJOR,
+  FW_VERSION_MINOR,
+  NUM_ELECTRODES,
+  HW_REVISION,
+  ADC_MAX,
+  SIGNAL_MAX,
+  ACTIVE_THRESHOLD,
+  SAMPLE_RATE,
+  DEVICE_NAME,
+};
