@@ -45,3 +45,9 @@ src/
 
 - **macOS:** bleno uses the built-in Bluetooth hardware. You may need to grant Bluetooth permissions in System Preferences → Privacy & Security → Bluetooth.
 - **Windows:** Requires a BLE 4.0+ USB adapter. Install the WinUSB driver using Zadig (select your BLE adapter, replace driver with WinUSB).
+
+## Documentation
+
+- [macOS Setup Guide](docs/SETUP_MACOS.md)
+- [Windows Setup Guide](docs/SETUP_WINDOWS.md)
+- [BLE Protocol Reference](docs/PROTOCOL.md)
