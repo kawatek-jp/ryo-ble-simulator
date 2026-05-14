@@ -88,7 +88,9 @@ class BlePeripheral {
 
   _startAdvertising() {
     console.log('[BLE] Starting advertising...');
-    bleno.startAdvertising(DEVICE_NAME, [SERVICE_UUID], (error) => {
+    // On macOS, advertising a 128-bit service UUID can exceed the 31-byte ad packet limit.
+    // Advertise with name only; the service UUID is discoverable after connection.
+    bleno.startAdvertising(DEVICE_NAME, [], (error) => {
       if (error) {
         console.error('[BLE] Start advertising error:', error);
       }
