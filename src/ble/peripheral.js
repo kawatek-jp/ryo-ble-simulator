@@ -37,7 +37,20 @@ class BlePeripheral {
     bleno.on('stateChange', (state) => {
       console.log(`[BLE] Adapter state: ${state}`);
       if (state === 'poweredOn') {
-        this._startAdvertising();
+        // On macOS, set services FIRST, then advertise.
+        // setServices can reset the peripheral manager and kill active ads.
+        const { service, characteristics } = createRyoService(this._state);
+        this._service = service;
+        this._characteristics = characteristics;
+
+        bleno.setServices([service], (err) => {
+          if (err) {
+            console.error('[BLE] Set services error:', err);
+          } else {
+            console.log('[BLE] GATT service registered');
+            this._startAdvertising();
+          }
+        });
       } else {
         if (this._isAdvertising) {
           bleno.stopAdvertising();
@@ -52,20 +65,7 @@ class BlePeripheral {
         return;
       }
       this._isAdvertising = true;
-      console.log('[BLE] Advertising started');
-
-      // Set up the GATT service
-      const { service, characteristics } = createRyoService(this._state);
-      this._service = service;
-      this._characteristics = characteristics;
-
-      bleno.setServices([service], (err) => {
-        if (err) {
-          console.error('[BLE] Set services error:', err);
-        } else {
-          console.log('[BLE] GATT service registered');
-        }
-      });
+      console.log('[BLE] Advertising started — device is discoverable');
     });
 
     bleno.on('accept', (clientAddress) => {
@@ -88,7 +88,9 @@ class BlePeripheral {
 
   _startAdvertising() {
     console.log('[BLE] Starting advertising...');
-    bleno.startAdvertising(DEVICE_NAME, [SERVICE_UUID], (error) => {
+    // On macOS, advertising a 128-bit service UUID can exceed the 31-byte ad packet limit.
+    // Advertise with name only; the service UUID is discoverable after connection.
+    bleno.startAdvertising(DEVICE_NAME, [], (error) => {
       if (error) {
         console.error('[BLE] Start advertising error:', error);
       }
